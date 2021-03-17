@@ -1,4 +1,3 @@
-import dis
 from socket import socket, AF_INET, SOCK_STREAM
 import sys
 import argparse
@@ -10,44 +9,25 @@ import logs.config_server_log
 from common.variables import *
 from common.utils import *
 from decos import log
-
+from descriptors import PortVerifier
+from metaclasses import ServerVerifier
 
 logger = logging.getLogger('server')
 
 
-class ServerVerifier(type):
-    def __init__(self, clsname, bases, clsdict):
-        super().__init__(clsname, bases, clsdict)
-        methods = []
-        attrs = []
-        for func in clsdict:
-            try:
-                ret = dis.get_instructions(clsdict[func])
-            except TypeError:
-                pass
-            else:
-                for i in ret:
-                    if i.opname == 'LOAD_GLOBAL':
-                        if i.argval not in methods:
-                            methods.append(i.argval)
-                    elif i.opname == 'LOAD_ATTR':
-                        if i.argval not in attrs:
-                            attrs.append(i.argval)
-        if 'connect' in methods:
-            raise TypeError('Использование connect в классе сервера')
-        if not ('SOCK_STREAM' or 'AF_INET') in methods:
-            raise TypeError('Некорректная инициализация сокета')
-
-
 class Server(metaclass=ServerVerifier):
 
-    def main(self):
-        listen_address, listen_port = self.arg_parser()
+    listen_port = PortVerifier()
 
+    def __init__(self):
+        self.listen_port = self.arg_parser()[1]
+
+    def main(self):
+        listen_address = self.arg_parser()[0]
         logger.info(
-            f'Запущен сервер, порт для подключений: {listen_port} , адрес с которого принимаются подключения: {listen_address}. Если адрес не указан, принимаются соединения с любых адресов.')
+            f'Запущен сервер, порт для подключений: {self.listen_port} , адрес с которого принимаются подключения: {listen_address}. Если адрес не указан, принимаются соединения с любых адресов.')
         transport = socket(AF_INET, SOCK_STREAM)
-        transport.bind((listen_address, listen_port))
+        transport.bind((listen_address, self.listen_port))
         transport.settimeout(0.5)
 
         clients = []
@@ -132,8 +112,9 @@ class Server(metaclass=ServerVerifier):
             send_message(client, response)
             return
 
+    @staticmethod
     @log
-    def arg_parser(self):
+    def arg_parser():
         parser = argparse.ArgumentParser()
         parser.add_argument('-p', default=DEFAULT_PORT, type=int, nargs='?')
         parser.add_argument('-a', default='', nargs='?')
