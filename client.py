@@ -1,6 +1,6 @@
 import sys
 import json
-import socket
+from socket import socket, AF_INET, SOCK_STREAM
 import time
 import argparse
 import logging
@@ -34,8 +34,11 @@ class ClientVerifier(type):
                             attrs.append(i.argval)
         if ('accept' or 'listen') in methods:
             raise TypeError('Использование accept или listen в классе клиента')
-        if not ('SOCK_STREAM' or 'AF_INET') in attrs:
+        if not ('SOCK_STREAM' or 'AF_INET') in methods:
             raise TypeError('Некорректная инициализация сокета')
+        for value in dict(clsdict).values():
+            if str(type(value)) == "<class 'socket.socket'>":
+                raise TypeError('Сокет создается на уровне класса')
 
 
 class Client(metaclass=ClientVerifier):
@@ -161,7 +164,7 @@ class Client(metaclass=ClientVerifier):
             f'Запущен клиент с парамертами: адрес сервера: {server_address} , порт: {server_port}, имя пользователя: {client_name}')
 
         try:
-            transport = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            transport = socket(AF_INET, SOCK_STREAM)
             transport.connect((server_address, server_port))
             send_message(transport, self.create_presence(client_name))
             answer = self.process_response_ans(get_message(transport))

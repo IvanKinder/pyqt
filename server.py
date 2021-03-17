@@ -1,5 +1,5 @@
 import dis
-import socket
+from socket import socket, AF_INET, SOCK_STREAM
 import sys
 import argparse
 import json
@@ -35,7 +35,7 @@ class ServerVerifier(type):
                             attrs.append(i.argval)
         if 'connect' in methods:
             raise TypeError('Использование connect в классе сервера')
-        if not ('SOCK_STREAM' or 'AF_INET') in attrs:
+        if not ('SOCK_STREAM' or 'AF_INET') in methods:
             raise TypeError('Некорректная инициализация сокета')
 
 
@@ -46,7 +46,7 @@ class Server(metaclass=ServerVerifier):
 
         logger.info(
             f'Запущен сервер, порт для подключений: {listen_port} , адрес с которого принимаются подключения: {listen_address}. Если адрес не указан, принимаются соединения с любых адресов.')
-        transport = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        transport = socket(AF_INET, SOCK_STREAM)
         transport.bind((listen_address, listen_port))
         transport.settimeout(0.5)
 
