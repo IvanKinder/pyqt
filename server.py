@@ -34,7 +34,6 @@ class Server(metaclass=ServerVerifier):
         clients = []
         messages = []
 
-        print(self.database)
         names = dict()
 
         transport.listen(MAX_CONNECTIONS)
@@ -65,6 +64,7 @@ class Server(metaclass=ServerVerifier):
                         for key, value in names.items():
                             if value == client_with_message:
                                 self.database.user_logout(key)
+                                names[key] = None
                         logger.info(f'Клиент {client_with_message.getpeername()} отключился от сервера.')
                         clients.remove(client_with_message)
 
@@ -96,7 +96,7 @@ class Server(metaclass=ServerVerifier):
         logger.debug(f'Разбор сообщения от клиента : {message}')
         if ACTION in message and message[ACTION] == PRESENCE and TIME in message and USER in message:
             client_to_db = (message['user']['account_name'], client.getsockname()[0], client.getsockname()[1],)
-            if message[USER][ACCOUNT_NAME] not in names.keys():
+            if message[USER][ACCOUNT_NAME] not in names.keys() or names[message[USER][ACCOUNT_NAME]] is None:
                 self.database.user_login(client_to_db[0], client_to_db[1], client_to_db[2])
                 names[message[USER][ACCOUNT_NAME]] = client
                 send_message(client, RESPONSE_200)

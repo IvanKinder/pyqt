@@ -145,8 +145,8 @@ class Client(metaclass=ClientVerifier):
         except json.JSONDecodeError:
             logger.error('Не удалось декодировать полученную Json строку.')
             exit(1)
-        except ERROR as error:
-            logger.error(f'При установке соединения сервер вернул ошибку: {error.text}')
+        except TypeError as error:
+            logger.error(f'При установке соединения сервер вернул ошибку: {error}')
             exit(1)
         except ERROR as missing_error:
             logger.error(f'В ответе сервера отсутствует необходимое поле {missing_error.missing_field}')
