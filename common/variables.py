@@ -13,6 +13,8 @@ ENCODING = 'utf-8'
 # Текущий уровень логирования
 LOGGING_LEVEL = logging.DEBUG
 
+SERVER_DATABASE = 'sqlite:///server_base.db3'
+
 # Прококол JIM основные ключи:
 ACTION = 'action'
 TIME = 'time'
