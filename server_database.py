@@ -11,7 +11,6 @@ class ServerStorage:
         def __init__(self, username):
             self.username = username
             self.last_login = datetime.now()
-            self.id = None
 
     class ActiveUsers:
         def __init__(self, user_id, ip_adress, port, login_time):
@@ -19,7 +18,6 @@ class ServerStorage:
             self.ip_adress = ip_adress
             self.port = port
             self.login_time = login_time
-            self.id = None
 
     class LoginHistory:
         def __init__(self, user_id, date, ip_adress, port):
@@ -27,7 +25,6 @@ class ServerStorage:
             self.date = date
             self.ip_adress = ip_adress
             self.port = port
-            self.id = None
 
     def __init__(self):
         self.database_engine = create_engine(SERVER_DATABASE, echo=False, pool_recycle=7200)
@@ -91,11 +88,14 @@ class ServerStorage:
         self.session.commit()
 
     def user_logout(self, username):
-        user = self.session.query(self.AllUsers).filter_by(username=username).first()
+        try:
+            user = self.session.query(self.AllUsers).filter_by(username=username).first()
 
-        self.session.query(self.ActiveUsers).filter_by(user_id=user.id).delete()
+            self.session.query(self.ActiveUsers).filter_by(user_id=user.id).delete()
 
-        self.session.commit()
+            self.session.commit()
+        except:
+            pass
 
     def users_list(self):
         query = self.session.query(
@@ -129,15 +129,15 @@ class ServerStorage:
         return query.all()
 
 
-if __name__ == '__main__':
-    test_db = ServerStorage()
-    test_db.user_login('user1', '192.168.0.1', 1234)
-    test_db.user_login('user2', '192.168.0.2', 2345)
-    print(test_db.users_list())
-    print(test_db.active_users_list())
-
-    test_db.user_logout('user1')
-    print(test_db.active_users_list())
-
-    print(test_db.login_history())
-    print(test_db.login_history('user1'))
+# if __name__ == '__main__':
+#     test_db = ServerStorage()
+#     test_db.user_login('user1', '192.168.0.1', 1234)
+#     test_db.user_login('user2', '192.168.0.2', 2345)
+#     print(test_db.users_list())
+#     print(test_db.active_users_list())
+#
+#     test_db.user_logout('user1')
+#     print(test_db.active_users_list())
+#
+#     print(test_db.login_history())
+#     print(test_db.login_history('user1'))

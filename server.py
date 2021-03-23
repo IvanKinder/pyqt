@@ -11,16 +11,17 @@ from common.utils import *
 from decos import log
 from descriptors import PortVerifier
 from metaclasses import ServerVerifier
+from server_database import ServerStorage
 
 logger = logging.getLogger('server')
 
 
 class Server(metaclass=ServerVerifier):
-
     listen_port = PortVerifier()
 
-    def __init__(self):
+    def __init__(self, database):
         self.listen_port = self.arg_parser()[1]
+        self.database = database
 
     def main(self):
         listen_address = self.arg_parser()[0]
@@ -33,6 +34,7 @@ class Server(metaclass=ServerVerifier):
         clients = []
         messages = []
 
+        print(self.database)
         names = dict()
 
         transport.listen(MAX_CONNECTIONS)
@@ -60,6 +62,9 @@ class Server(metaclass=ServerVerifier):
                         self.process_client_message(get_message(client_with_message), messages, client_with_message, clients,
                                                names)
                     except:
+                        for key, value in names.items():
+                            if value == client_with_message:
+                                self.database.user_logout(key)
                         logger.info(f'Клиент {client_with_message.getpeername()} отключился от сервера.')
                         clients.remove(client_with_message)
 
@@ -67,6 +72,9 @@ class Server(metaclass=ServerVerifier):
                 try:
                     self.process_message(i, names, send_data_lst)
                 except:
+                    for key, value in names.items():
+                        if value == i[DESTINATION]:
+                            self.database.user_logout(key)
                     logger.info(f'Связь с клиентом с именем {i[DESTINATION]} была потеряна')
                     clients.remove(names[i[DESTINATION]])
                     del names[i[DESTINATION]]
@@ -87,7 +95,9 @@ class Server(metaclass=ServerVerifier):
     def process_client_message(self, message, messages_list, client, clients, names):
         logger.debug(f'Разбор сообщения от клиента : {message}')
         if ACTION in message and message[ACTION] == PRESENCE and TIME in message and USER in message:
+            client_to_db = (message['user']['account_name'], client.getsockname()[0], client.getsockname()[1],)
             if message[USER][ACCOUNT_NAME] not in names.keys():
+                self.database.user_login(client_to_db[0], client_to_db[1], client_to_db[2])
                 names[message[USER][ACCOUNT_NAME]] = client
                 send_message(client, RESPONSE_200)
             else:
@@ -130,6 +140,11 @@ class Server(metaclass=ServerVerifier):
         return listen_address, listen_port
 
 
-if __name__ == '__main__':
-    server = Server()
+def main():
+    database = ServerStorage()
+    server = Server(database)
     server.main()
+
+
+if __name__ == '__main__':
+   main()
