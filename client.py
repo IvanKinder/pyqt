@@ -67,6 +67,18 @@ class Client(metaclass=ClientVerifier):
         print('q - выход из программы')
 
     @log
+    def get_contacts(self, account_name):
+        out = {
+            ACTION: 'get_contacts',
+            TIME: time.time(),
+            USER: {
+                ACCOUNT_NAME: account_name
+            }
+        }
+        logger.debug(f'Сформирован запрос контактов для пользователя {account_name}')
+        return out
+
+    @log
     def user_interactive(self, sock, username):
         self.print_help()
         while True:
@@ -75,6 +87,8 @@ class Client(metaclass=ClientVerifier):
                 self.create_message(sock, username)
             elif command == 'h':
                 self.print_help()
+            elif command == 'g':
+                self.get_contacts(sock, username)
             elif command == 'q':
                 send_message(sock, self.create_exit_message(username))
                 print('Завершение соединения.')

@@ -82,8 +82,10 @@ class Server(metaclass=ServerVerifier):
 
     @log
     def process_message(self, message, names, listen_socks):
+        print(message[ACTION])
         if message[DESTINATION] in names and names[message[DESTINATION]] in listen_socks:
             send_message(names[message[DESTINATION]], message)
+            self.database.process_message(message[SENDER], message[DESTINATION])
             logger.info(f'Отправлено сообщение пользователю {message[DESTINATION]} от пользователя {message[SENDER]}.')
         elif message[DESTINATION] in names and names[message[DESTINATION]] not in listen_socks:
             raise ConnectionError
@@ -125,26 +127,26 @@ class Server(metaclass=ServerVerifier):
     @staticmethod
     @log
     def arg_parser():
-        parser = argparse.ArgumentParser()
-        parser.add_argument('-p', default=DEFAULT_PORT, type=int, nargs='?')
-        parser.add_argument('-a', default='', nargs='?')
-        namespace = parser.parse_args(sys.argv[1:])
-        listen_address = namespace.a
-        listen_port = namespace.p
+        try:
+            parser = argparse.ArgumentParser()
+            parser.add_argument('-p', default=DEFAULT_PORT, type=int, nargs='?')
+            parser.add_argument('-a', default='', nargs='?')
+            namespace = parser.parse_args(sys.argv[1:])
+            listen_address = namespace.a
+            listen_port = namespace.p
 
-        if not 1023 < listen_port < 65536:
-            logger.critical(
-                f'Попытка запуска сервера с указанием неподходящего порта {listen_port}. Допустимы адреса с 1024 до 65535.')
-            exit(1)
+            if not 1023 < listen_port < 65536:
+                logger.critical(
+                    f'Попытка запуска сервера с указанием неподходящего порта {listen_port}. Допустимы адреса с 1024 до 65535.')
+                exit(1)
 
-        return listen_address, listen_port
+            return listen_address, listen_port
+        except:
+            pass
 
-
-def main():
+try:
     database = ServerStorage()
     server = Server(database)
     server.main()
-
-
-if __name__ == '__main__':
-   main()
+except:
+    pass
