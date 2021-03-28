@@ -73,6 +73,7 @@ class Client(metaclass=ClientVerifier):
         print('g - вывести ваши контакты')
         print('a - добавить новый контакт')
         print('d - удалить контакт')
+        print('i - история сообщений')
         print('q - выход из программы')
 
     @log
@@ -122,6 +123,20 @@ class Client(metaclass=ClientVerifier):
             exit(1)
 
     @log
+    def get_message_history(self, sock, username):
+        out = {
+            ACTION: MESSAGE_HISTORY,
+            TIME: time.time(),
+            ACCOUNT_NAME: username,
+        }
+        logger.debug(f'Сформирован запрос получения истории для пользователя {username}')
+        try:
+            send_message(sock, out)
+        except:
+            logger.critical('Потеряно соединение с сервером.')
+            exit(1)
+
+    @log
     def user_interactive(self, sock, username):
         self.print_help()
         while True:
@@ -136,6 +151,8 @@ class Client(metaclass=ClientVerifier):
                 self.add_contact(sock, username)
             elif command == 'd':
                 self.delete_contact(sock, username)
+            elif command == 'i':
+                self.get_message_history(sock, username)
             elif command == 'q':
                 send_message(sock, self.create_exit_message(username))
                 print('Завершение соединения.')

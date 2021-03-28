@@ -113,6 +113,19 @@ class Server(metaclass=ServerVerifier):
                 and SENDER in message and MESSAGE_TEXT in message:
             messages_list.append(message)
             return
+        elif ACTION in message and message[ACTION] == MESSAGE_HISTORY:
+            hist = self.database.message_history()
+            for h in hist:
+                if message[ACCOUNT_NAME] in h:
+                    print(h)
+                    text = f'Отправленных сообщений: {h[2]}; полученных сообщений: {h[3]}'
+                    out = {
+                        ACTION: GET_CONTACTS,
+                        MESSAGE_TEXT: text,
+                        RESPONSE: RESPONSE_201
+                    }
+                    send_message(client, out)
+            return
         elif ACTION in message and message[ACTION] == GET_CONTACTS and ACCOUNT_NAME in message:
             contacts_list = self.database.get_contacts(message[ACCOUNT_NAME])
             out = {

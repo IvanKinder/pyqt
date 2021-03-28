@@ -33,6 +33,7 @@ MESSAGE_TEXT = 'mess_text'
 GET_CONTACTS = 'get_contacts'
 ADD_CONTACT = 'add_contact'
 DEL_CONTACT = 'del_contact'
+MESSAGE_HISTORY = 'get_message_history'
 EXIT = 'exit'
 
 # Словари - ответы:
