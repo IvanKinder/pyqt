@@ -22,6 +22,7 @@ USER = 'user'
 ACCOUNT_NAME = 'account_name'
 SENDER = 'from'
 DESTINATION = 'to'
+CONTACT = 'contact_name'
 
 # Прочие ключи, используемые в протоколе
 PRESENCE = 'presence'
@@ -29,11 +30,16 @@ RESPONSE = 'response'
 ERROR = 'error'
 MESSAGE = 'message'
 MESSAGE_TEXT = 'mess_text'
+GET_CONTACTS = 'get_contacts'
+ADD_CONTACT = 'add_contact'
+DEL_CONTACT = 'del_contact'
 EXIT = 'exit'
 
 # Словари - ответы:
 # 200
 RESPONSE_200 = {RESPONSE: 200}
+RESPONSE_201 = {RESPONSE: 201}
+RESPONSE_202 = {RESPONSE: 202}
 # 400
 RESPONSE_400 = {
             RESPONSE: 400,

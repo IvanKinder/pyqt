@@ -33,6 +33,12 @@ class Client(metaclass=ClientVerifier):
                         and MESSAGE_TEXT in message and message[DESTINATION] == my_username:
                     print(f'\nПолучено сообщение от пользователя {message[SENDER]}:\n{message[MESSAGE_TEXT]}')
                     logger.info(f'Получено сообщение от пользователя {message[SENDER]}:\n{message[MESSAGE_TEXT]}')
+                elif ACTION in message and message[ACTION] == GET_CONTACTS:
+                    print(message[MESSAGE_TEXT])
+                elif ACTION in message and message[ACTION] == ADD_CONTACT:
+                    print(message[MESSAGE_TEXT])
+                elif ACTION in message and message[ACTION] == DEL_CONTACT:
+                    print(message[MESSAGE_TEXT])
                 else:
                     logger.error(f'Получено некорректное сообщение с сервера: {message}')
             except ERROR:
@@ -64,19 +70,56 @@ class Client(metaclass=ClientVerifier):
         print('Поддерживаемые команды:')
         print('m - отправить сообщение. Кому и текст будет запрошены отдельно.')
         print('h - вывести подсказки по командам')
+        print('g - вывести ваши контакты')
+        print('a - добавить новый контакт')
+        print('d - удалить контакт')
         print('q - выход из программы')
 
     @log
-    def get_contacts(self, account_name):
+    def get_contacts(self, sock, username):
         out = {
-            ACTION: 'get_contacts',
+            ACTION: GET_CONTACTS,
             TIME: time.time(),
-            USER: {
-                ACCOUNT_NAME: account_name
-            }
+            ACCOUNT_NAME: username
         }
-        logger.debug(f'Сформирован запрос контактов для пользователя {account_name}')
-        return out
+        logger.debug(f'Сформирован запрос контактов для пользователя {username}')
+        try:
+            send_message(sock, out)
+        except:
+            logger.critical('Потеряно соединение с сервером.')
+            exit(1)
+
+    @log
+    def add_contact(self, sock, username):
+        contact = input('ВВедите имя контакта, который хотите добавить: ')
+        out = {
+            ACTION: ADD_CONTACT,
+            TIME: time.time(),
+            ACCOUNT_NAME: username,
+            CONTACT: contact
+        }
+        logger.debug(f'Сформирован запрос добавления контакта {contact} для пользователя {username}')
+        try:
+            send_message(sock, out)
+        except:
+            logger.critical('Потеряно соединение с сервером.')
+            exit(1)
+
+    @log
+    def delete_contact(self, sock, username):
+        contact = input('ВВедите имя контакта, который хотите удалить: ')
+        out = {
+            ACTION: DEL_CONTACT,
+            TIME: time.time(),
+            ACCOUNT_NAME: username,
+            CONTACT: contact
+        }
+        logger.debug(f'Сформирован запрос удаления контакта {contact} для пользователя {username}')
+        try:
+            send_message(sock, out)
+        except:
+            logger.critical('Потеряно соединение с сервером.')
+            exit(1)
 
     @log
     def user_interactive(self, sock, username):
@@ -89,6 +132,10 @@ class Client(metaclass=ClientVerifier):
                 self.print_help()
             elif command == 'g':
                 self.get_contacts(sock, username)
+            elif command == 'a':
+                self.add_contact(sock, username)
+            elif command == 'd':
+                self.delete_contact(sock, username)
             elif command == 'q':
                 send_message(sock, self.create_exit_message(username))
                 print('Завершение соединения.')
