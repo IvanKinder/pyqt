@@ -5,7 +5,11 @@ import time
 import argparse
 import logging
 import threading
+
+from PyQt5.QtWidgets import QApplication
+
 import logs.config_client_log
+from common.client_windows import StartWindow
 from common.variables import *
 from common.utils import *
 from metaclasses import ClientVerifier
@@ -60,7 +64,7 @@ class Client(metaclass=ClientVerifier):
         }
         logger.debug(f'Сформирован словарь сообщения: {message_dict}')
         try:
-            send_message(sock, message_dict)
+            send_message_util(sock, message_dict)
             logger.info(f'Отправлено сообщение для пользователя {to}')
         except:
             logger.critical('Потеряно соединение с сервером.')
@@ -85,7 +89,7 @@ class Client(metaclass=ClientVerifier):
         }
         logger.debug(f'Сформирован запрос контактов для пользователя {username}')
         try:
-            send_message(sock, out)
+            send_message_util(sock, out)
         except:
             logger.critical('Потеряно соединение с сервером.')
             exit(1)
@@ -101,7 +105,7 @@ class Client(metaclass=ClientVerifier):
         }
         logger.debug(f'Сформирован запрос добавления контакта {contact} для пользователя {username}')
         try:
-            send_message(sock, out)
+            send_message_util(sock, out)
         except:
             logger.critical('Потеряно соединение с сервером.')
             exit(1)
@@ -117,7 +121,7 @@ class Client(metaclass=ClientVerifier):
         }
         logger.debug(f'Сформирован запрос удаления контакта {contact} для пользователя {username}')
         try:
-            send_message(sock, out)
+            send_message_util(sock, out)
         except:
             logger.critical('Потеряно соединение с сервером.')
             exit(1)
@@ -131,7 +135,7 @@ class Client(metaclass=ClientVerifier):
         }
         logger.debug(f'Сформирован запрос получения истории для пользователя {username}')
         try:
-            send_message(sock, out)
+            send_message_util(sock, out)
         except:
             logger.critical('Потеряно соединение с сервером.')
             exit(1)
@@ -154,7 +158,7 @@ class Client(metaclass=ClientVerifier):
             elif command == 'i':
                 self.get_message_history(sock, username)
             elif command == 'q':
-                send_message(sock, self.create_exit_message(username))
+                send_message_util(sock, self.create_exit_message(username))
                 print('Завершение соединения.')
                 logger.info('Завершение работы по команде пользователя.')
                 time.sleep(0.5)
@@ -208,15 +212,19 @@ class Client(metaclass=ClientVerifier):
         server_address, server_port, client_name = self.arg_parser()
 
         if not client_name:
-            client_name = input('Введите имя пользователя: ')
-
+            # client_name = input('Введите имя пользователя: ')
+            start_app = QApplication([])
+            start_window = StartWindow()
+            start_app.exec_()
+            client_name = start_window.client_name.text()
+            del start_app
         logger.info(
             f'Запущен клиент с парамертами: адрес сервера: {server_address} , порт: {server_port}, имя пользователя: {client_name}')
 
         try:
             transport = socket(AF_INET, SOCK_STREAM)
             transport.connect((server_address, server_port))
-            send_message(transport, self.create_presence(client_name))
+            send_message_util(transport, self.create_presence(client_name))
             answer = self.process_response_ans(get_message(transport))
             logger.info(f'Установлено соединение с сервером. Ответ сервера: {answer}')
             print(f'Установлено соединение с сервером.')

@@ -27,7 +27,7 @@ def get_message(client):
 # Утилита кодирования и отправки сообщения
 # принимает словарь и отправляет его
 @log
-def send_message(sock, message):
+def send_message_util(sock, message):
     if not isinstance(message, dict):
         # raise NonDictInputError
         raise ERROR

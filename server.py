@@ -87,7 +87,7 @@ class Server(threading.Thread, metaclass=ServerVerifier):
     @log
     def process_message(self, message, names, listen_socks):
         if message[DESTINATION] in names and names[message[DESTINATION]] in listen_socks:
-            send_message(names[message[DESTINATION]], message)
+            send_message_util(names[message[DESTINATION]], message)
             self.database.process_message(message[SENDER], message[DESTINATION])
             logger.info(f'Отправлено сообщение пользователю {message[DESTINATION]} от пользователя {message[SENDER]}.')
         elif message[DESTINATION] in names and names[message[DESTINATION]] not in listen_socks:
@@ -105,11 +105,11 @@ class Server(threading.Thread, metaclass=ServerVerifier):
             if message[USER][ACCOUNT_NAME] not in names.keys() or names[message[USER][ACCOUNT_NAME]] is None:
                 self.database.user_login(client_to_db[0], client_to_db[1], client_to_db[2])
                 names[message[USER][ACCOUNT_NAME]] = client
-                send_message(client, RESPONSE_200)
+                send_message_util(client, RESPONSE_200)
             else:
                 response = RESPONSE_400
                 response[ERROR] = 'Имя пользователя уже занято.'
-                send_message(client, response)
+                send_message_util(client, response)
                 clients.remove(client)
                 client.close()
             return
@@ -128,7 +128,7 @@ class Server(threading.Thread, metaclass=ServerVerifier):
                         MESSAGE_TEXT: text,
                         RESPONSE: RESPONSE_201
                     }
-                    send_message(client, out)
+                    send_message_util(client, out)
             return
         elif ACTION in message and message[ACTION] == GET_CONTACTS and ACCOUNT_NAME in message:
             contacts_list = self.database.get_contacts(message[ACCOUNT_NAME])
@@ -137,7 +137,7 @@ class Server(threading.Thread, metaclass=ServerVerifier):
                 MESSAGE_TEXT: f'\n{contacts_list}',
                 RESPONSE: RESPONSE_202
             }
-            send_message(client, out)
+            send_message_util(client, out)
             return
         elif ACTION in message and message[ACTION] == ADD_CONTACT and ACCOUNT_NAME in message:
             tmp_list = []
@@ -155,7 +155,7 @@ class Server(threading.Thread, metaclass=ServerVerifier):
                 RESPONSE: RESPONSE_200,
                 MESSAGE_TEXT: msg_text
             }
-            send_message(client, out)
+            send_message_util(client, out)
             return
         elif ACTION in message and message[ACTION] == DEL_CONTACT and ACCOUNT_NAME in message:
             if message[CONTACT] in self.database.get_contacts(message[ACCOUNT_NAME]):
@@ -168,7 +168,7 @@ class Server(threading.Thread, metaclass=ServerVerifier):
                 RESPONSE: RESPONSE_201,
                 MESSAGE_TEXT: msg_text
             }
-            send_message(client, out)
+            send_message_util(client, out)
             return
         elif ACTION in message and message[ACTION] == EXIT and ACCOUNT_NAME in message:
             clients.remove(names[ACCOUNT_NAME])
@@ -178,7 +178,7 @@ class Server(threading.Thread, metaclass=ServerVerifier):
         else:
             response = RESPONSE_400
             response[ERROR] = 'Запрос некорректен.'
-            send_message(client, response)
+            send_message_util(client, response)
             return
 
     @staticmethod
