@@ -1,3 +1,4 @@
+import threading
 from socket import socket, AF_INET, SOCK_STREAM
 import sys
 import argparse
@@ -5,6 +6,7 @@ import json
 import logging
 import select
 import time
+
 import logs.config_server_log
 from common.variables import *
 from common.utils import *
@@ -16,10 +18,11 @@ from server_database import ServerStorage
 logger = logging.getLogger('server')
 
 
-class Server(metaclass=ServerVerifier):
+class Server(threading.Thread, metaclass=ServerVerifier):
     listen_port = PortVerifier()
 
     def __init__(self, database):
+        super().__init__()
         self.listen_port = self.arg_parser()[1]
         self.database = database
 
@@ -37,6 +40,7 @@ class Server(metaclass=ServerVerifier):
         names = dict()
 
         transport.listen(MAX_CONNECTIONS)
+
         while True:
             try:
                 client, client_address = transport.accept()
@@ -201,5 +205,7 @@ try:
     database = ServerStorage()
     server = Server(database)
     server.main()
+    server.daemon = True
+    server.start()
 except:
     pass
