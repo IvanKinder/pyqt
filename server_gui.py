@@ -65,10 +65,13 @@ class MainWindow(QMainWindow):
         self.refresh_button = QAction('Обновить список', self)
 
         # Кнопка настроек сервера
-        self.config_btn = QAction('Настройки сервера' , self)
+        self.config_btn = QAction('Настройки сервера', self)
 
         # Кнопка вывести историю сообщений
         self.show_history_button = QAction('История клиентов', self)
+
+        # Регистрация
+        self.show_registration_button = QAction('Регистрация пользователя', self)
 
         # Статусбар
         self.statusBar()
@@ -79,11 +82,12 @@ class MainWindow(QMainWindow):
         self.toolbar.addAction(self.refresh_button)
         self.toolbar.addAction(self.show_history_button)
         self.toolbar.addAction(self.config_btn)
+        self.toolbar.addAction(self.show_registration_button)
 
         # Настройки геометрии основного окна
         # Поскольку работать с динамическими размерами мы не умеем, и мало времени на изучение, размер окна фиксирован.
         self.setFixedSize(800, 600)
-        self.setWindowTitle('Messaging Server alpha release')
+        self.setWindowTitle('Messaging Server')
 
         # Надпись о том, что ниже список подключённых клиентов
         self.label = QLabel('Список подключённых клиентов:', self)
@@ -120,6 +124,54 @@ class HistoryWindow(QDialog):
         self.history_table = QTableView(self)
         self.history_table.move(10, 10)
         self.history_table.setFixedSize(580, 620)
+
+        # Регистрация
+
+        self.show()
+
+
+class RegistrationWindow(QDialog):
+    def __init__(self):
+        super().__init__()
+        self.initUI()
+
+    def initUI(self):
+        # Настройки окна:
+        self.setWindowTitle('Регистрация')
+        self.setFixedSize(185, 200)
+
+        self.username = QLabel('Введите имя пользователя: ', self)
+        self.username.move(10, 10)
+        self.username.setFixedSize(185, 15)
+
+        self.input_username = QLineEdit(self)
+        self.input_username.setFixedSize(165, 20)
+        self.input_username.move(10, 30)
+
+        self.password = QLabel('Введите пароль: ', self)
+        self.password.move(10, 60)
+        self.password.setFixedSize(185, 15)
+
+        self.input_password = QLineEdit(self)
+        self.input_password.setEchoMode(QLineEdit.Password)
+        self.input_password.setFixedSize(165, 20)
+        self.input_password.move(10, 80)
+
+        self.password_again = QLabel('Повторите пароль: ', self)
+        self.password_again.move(10, 110)
+        self.password_again.setFixedSize(185, 15)
+
+        self.input_password_again = QLineEdit(self)
+        self.input_password_again.setEchoMode(QLineEdit.Password)
+        self.input_password_again.setFixedSize(165, 20)
+        self.input_password_again.move(10, 130)
+
+        self.user_save = QPushButton('Сохранить', self)
+        self.user_save.move(10, 160)
+
+        self.close_button = QPushButton('Выход', self)
+        self.close_button.move(100, 160)
+        self.close_button.clicked.connect(self.close)
 
         self.show()
 
@@ -197,8 +249,8 @@ class ConfigWindow(QDialog):
         self.ip.setFixedSize(150, 20)
 
         # Кнопка сохранения настроек
-        self.save_btn = QPushButton('Сохранить' , self)
-        self.save_btn.move(190 , 220)
+        self.save_btn = QPushButton('Сохранить', self)
+        self.save_btn.move(190, 220)
 
         # Кнапка закрытия окна
         self.close_button = QPushButton('Закрыть', self)

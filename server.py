@@ -17,7 +17,7 @@ from metaclasses import ServerMaker
 from server_database import ServerStorage
 from PyQt5.QtWidgets import QApplication, QMessageBox
 from PyQt5.QtCore import QTimer
-from server_gui import MainWindow, gui_create_model, HistoryWindow, create_stat_model, ConfigWindow
+from server_gui import MainWindow, gui_create_model, HistoryWindow, create_stat_model, ConfigWindow, RegistrationWindow
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
 
 logger = logging.getLogger('server')
@@ -235,6 +235,24 @@ def main():
         stat_window.history_table.resizeRowsToContents()
         stat_window.show()
 
+    def registration_function():
+        global registation_window
+        registation_window = RegistrationWindow()
+        # registation_window.history_table.setModel(create_stat_model(database))
+        # registation_window.history_table.resizeColumnsToContents()
+        registation_window.user_save.clicked.connect(save_user)
+        registation_window.show()
+
+    def save_user():
+        username = registation_window.input_username.text()
+        passwd = registation_window.input_password.text()
+        passwd_again = registation_window.input_password_again.text()
+        if passwd == passwd_again and username and passwd and passwd_again:
+            print('Все хорошо')
+            mes = database.add_user(username, passwd)
+            message = QMessageBox()
+            message.information(registation_window, 'OK', mes)
+
     def server_config():
         global config_window
         config_window = ConfigWindow()
@@ -271,6 +289,7 @@ def main():
     main_window.refresh_button.triggered.connect(list_update)
     main_window.show_history_button.triggered.connect(show_statistics)
     main_window.config_btn.triggered.connect(server_config)
+    main_window.show_registration_button.triggered.connect(registration_function)
 
     server_app.exec_()
 

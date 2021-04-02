@@ -8,9 +8,10 @@ import datetime
 class ServerStorage:
     # Класс - отображение таблицы всех пользователей
     class AllUsers:
-        def __init__(self, username):
+        def __init__(self, username, password):
             self.name = username
             self.last_login = datetime.datetime.now()
+            self.password = password
             self.id = None
 
     # Класс - отображение таблицы активных пользователей:
@@ -111,6 +112,17 @@ class ServerStorage:
         # Если в таблице активных пользователей есть записи, то их необходимо удалить
         self.session.query(self.ActiveUsers).delete()
         self.session.commit()
+
+    # Добавление контакта
+    def add_user(self, username, password):
+        rez = self.session.query(self.AllUsers).filter_by(name=username)
+        if rez.count():
+            return 'Пользователь уже существует'
+        else:
+            user = self.AllUsers(username, password)
+            self.session.add(user)
+            self.session.commit()
+            return 'Пользователь сохранен!'
 
     # Функция выполняющяяся при входе пользователя, записывает в базу факт входа
     def user_login(self, username, ip_address, port):
