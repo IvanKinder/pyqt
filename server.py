@@ -1,3 +1,4 @@
+import hashlib
 import socket
 import sys
 import os
@@ -261,7 +262,9 @@ def main():
         passwd = registation_window.input_password.text()
         passwd_again = registation_window.input_password_again.text()
         if passwd == passwd_again and username and passwd and passwd_again:
-            mes = database.add_user(username, passwd)
+            h_pwd = hashlib.sha256()
+            h_pwd.update(str.encode(passwd))
+            mes = database.add_user(username, h_pwd.hexdigest())
             message = QMessageBox()
             message.information(registation_window, 'OK', mes)
 

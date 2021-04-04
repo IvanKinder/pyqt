@@ -1,3 +1,5 @@
+import hashlib
+
 from sqlalchemy import create_engine, Table, Column, Integer, String, MetaData, ForeignKey, DateTime
 from sqlalchemy.orm import mapper, sessionmaker
 from common.variables import *
@@ -127,8 +129,10 @@ class ServerStorage:
 
     # Проверка пароля
     def check_password(self, username, password_to_check):
+        h_pwd = hashlib.sha256()
+        h_pwd.update(str.encode(password_to_check))
         try:
-            if password_to_check == self.session.query(self.AllUsers).filter_by(name=username).first().password:
+            if h_pwd.hexdigest() == self.session.query(self.AllUsers).filter_by(name=username).first().password:
                 return True
         except:
             return False
