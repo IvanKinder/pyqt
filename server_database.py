@@ -59,6 +59,7 @@ class ServerStorage:
         users_table = Table('Users', self.metadata,
                             Column('id', Integer, primary_key=True),
                             Column('name', String, unique=True),
+                            Column('password', String),
                             Column('last_login', DateTime)
                             )
 
@@ -124,45 +125,56 @@ class ServerStorage:
             self.session.commit()
             return 'Пользователь сохранен!'
 
+    # Проверка пароля
+    def check_password(self, username, password_to_check):
+        try:
+            if password_to_check == self.session.query(self.AllUsers).filter_by(name=username).first().password:
+                return True
+        except:
+            return False
+
     # Функция выполняющяяся при входе пользователя, записывает в базу факт входа
-    def user_login(self, username, ip_address, port):
+    def user_login(self, username, password, ip_address, port):
         # Запрос в таблицу пользователей на наличие там пользователя с таким именем
         rez = self.session.query(self.AllUsers).filter_by(name=username)
-
         # Если имя пользователя уже присутствует в таблице, обновляем время последнего входа
         if rez.count():
             user = rez.first()
-            user.last_login = datetime.datetime.now()
+            if password == user.password:
+                user.last_login = datetime.datetime.now()
+                new_active_user = self.ActiveUsers(user.id, ip_address, port, datetime.datetime.now())
+                self.session.add(new_active_user)
+
+                # и сохранить в историю входов
+                history = self.LoginHistory(user.id, datetime.datetime.now(), ip_address, port)
+                self.session.add(history)
+
+                # Сохрраняем изменения
+                self.session.commit()
         # Если нету, то создаздаём нового пользователя
         else:
-            user = self.AllUsers(username)
-            self.session.add(user)
-            # Комит здесь нужен, чтобы присвоился ID
-            self.session.commit()
-            user_in_history = self.UsersHistory(user.id)
-            self.session.add(user_in_history)
-
-        # Теперь можно создать запись в таблицу активных пользователей о факте входа.
-        new_active_user = self.ActiveUsers(user.id, ip_address, port, datetime.datetime.now())
-        self.session.add(new_active_user)
-
-        # и сохранить в историю входов
-        history = self.LoginHistory(user.id, datetime.datetime.now(), ip_address, port)
-        self.session.add(history)
-
-        # Сохрраняем изменения
-        self.session.commit()
+            # user = self.AllUsers(username, password)
+            # self.session.add(user)
+            # # Комит здесь нужен, чтобы присвоился ID
+            # self.session.commit()
+            # user_in_history = self.UsersHistory(user.id)
+            # self.session.add(user_in_history)
+            print('Пользователь не зарегистрирован на сервере!')
+            exit(0)
 
     # Функция фиксирующая отключение пользователя
     def user_logout(self, username):
-        # Запрашиваем пользователя, что покидает нас
-        user = self.session.query(self.AllUsers).filter_by(name=username).first()
+        try:
+            # Запрашиваем пользователя, что покидает нас
+            user = self.session.query(self.AllUsers).filter_by(name=username).first()
 
-        # Удаляем его из таблицы активных пользователей.
-        self.session.query(self.ActiveUsers).filter_by(user=user.id).delete()
+            # Удаляем его из таблицы активных пользователей.
+            self.session.query(self.ActiveUsers).filter_by(user=user.id).delete()
 
-        # Применяем изменения
-        self.session.commit()
+            # Применяем изменения
+            self.session.commit()
+        except:
+            pass
 
     # Функция фиксирует передачу сообщения и делает соответствующие отметки в БД
     def process_message(self, sender, recipient):

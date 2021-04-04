@@ -35,7 +35,7 @@ class ClientDatabase:
 
         users = Table('known_users', self.metadata,
                       Column('id', Integer, primary_key=True),
-                      Column('username', String)
+                      Column('username', String),
                       )
 
         history = Table('message_history', self.metadata,
@@ -110,4 +110,4 @@ class ClientDatabase:
 
 if __name__ == '__main__':
     test_db = ClientDatabase('test1')
-    print(sorted(test_db.get_history('test2') , key=lambda item: item[3]))
+    print(sorted(test_db.get_history('test2'), key=lambda item: item[3]))

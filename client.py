@@ -2,7 +2,7 @@ import logging
 import logs.config_client_log
 import argparse
 import sys
-from PyQt5.QtWidgets import QApplication
+from PyQt5.QtWidgets import QApplication, QMessageBox
 
 from client_.database import ClientDatabase
 from common.variables import *
@@ -42,9 +42,9 @@ if __name__ == '__main__':
         start_dialog = UserNameDialog()
         client_app.exec_()
 
-        if start_dialog.ok_pressed:
+        if start_dialog.ok_pressed and start_dialog.client_name.text() and start_dialog.client_pas.text():
             client_name = start_dialog.client_name.text()
-            del start_dialog
+            client_password = start_dialog.client_pas.text()
         else:
             exit(0)
 
@@ -54,9 +54,13 @@ if __name__ == '__main__':
     database = ClientDatabase(client_name)
 
     try:
-        transport = ClientTransport(server_port, server_address, database, client_name)
+        transport = ClientTransport(server_port, server_address, database, client_name, client_password)
+        del start_dialog
     except Exception as err:
         print(str(err))
+        message = QMessageBox()
+        message.information(start_dialog, 'NOT OK', str(err))
+        del start_dialog
         exit(1)
     transport.setDaemon(True)
     transport.start()

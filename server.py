@@ -94,6 +94,16 @@ class Server(threading.Thread, metaclass=ServerMaker):
                         self.clients.remove(client_with_message)
                         with conflag_lock:
                             new_connection = True
+                    except:
+                        logger.info(f'Клиент {client_with_message.getpeername()} отключился от сервера.')
+                        for name in self.names:
+                            if self.names[name] == client_with_message:
+                                self.database.user_logout(name)
+                                del self.names[name]
+                                break
+                        self.clients.remove(client_with_message)
+                        with conflag_lock:
+                            new_connection = True
 
             for message in self.messages:
                 try:
@@ -122,13 +132,15 @@ class Server(threading.Thread, metaclass=ServerMaker):
         logger.debug(f'Разбор сообщения от клиента : {message}')
 
         if ACTION in message and message[ACTION] == PRESENCE and TIME in message and USER in message:
+            print(message)
             if message[USER][ACCOUNT_NAME] not in self.names.keys():
                 self.names[message[USER][ACCOUNT_NAME]] = client
                 client_ip, client_port = client.getpeername()
-                self.database.user_login(message[USER][ACCOUNT_NAME], client_ip, client_port)
-                send_message(client, RESPONSE_200)
-                with conflag_lock:
-                    new_connection = True
+                if self.database.check_password(message[USER][ACCOUNT_NAME], message[USER][ACCOUNT_PASSWORD]):
+                    self.database.user_login(message[USER][ACCOUNT_NAME], message[USER][ACCOUNT_PASSWORD], client_ip, client_port)
+                    send_message(client, RESPONSE_200)
+                    with conflag_lock:
+                        new_connection = True
             else:
                 response = RESPONSE_400
                 response[ERROR] = 'Имя пользователя уже занято.'
@@ -140,9 +152,12 @@ class Server(threading.Thread, metaclass=ServerMaker):
         elif ACTION in message and message[ACTION] == MESSAGE and DESTINATION in message and TIME in message \
                 and SENDER in message and MESSAGE_TEXT in message and self.names[message[SENDER]] == client:
             if message[DESTINATION] in self.names:
-                self.messages.append(message)
-                self.database.process_message(message[SENDER], message[DESTINATION])
-                send_message(client, RESPONSE_200)
+                try:
+                    self.messages.append(message)
+                    self.database.process_message(message[SENDER], message[DESTINATION])
+                    send_message(client, RESPONSE_200)
+                except Exception as ex:
+                    print(ex)
             else:
                 response = RESPONSE_400
                 response[ERROR] = 'Пользователь оффлайн.'
@@ -238,8 +253,6 @@ def main():
     def registration_function():
         global registation_window
         registation_window = RegistrationWindow()
-        # registation_window.history_table.setModel(create_stat_model(database))
-        # registation_window.history_table.resizeColumnsToContents()
         registation_window.user_save.clicked.connect(save_user)
         registation_window.show()
 
@@ -248,7 +261,6 @@ def main():
         passwd = registation_window.input_password.text()
         passwd_again = registation_window.input_password_again.text()
         if passwd == passwd_again and username and passwd and passwd_again:
-            print('Все хорошо')
             mes = database.add_user(username, passwd)
             message = QMessageBox()
             message.information(registation_window, 'OK', mes)

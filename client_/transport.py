@@ -5,6 +5,9 @@ import logging
 import json
 import threading
 from PyQt5.QtCore import pyqtSignal, QObject
+from PyQt5.QtWidgets import QMessageBox
+
+from client_ import start_dialog
 
 sys.path.append('../')
 from common.utils import *
@@ -19,12 +22,13 @@ class ClientTransport(threading.Thread, QObject):
     new_message = pyqtSignal(str)
     connection_lost = pyqtSignal()
 
-    def __init__(self, port, ip_address, database, username):
+    def __init__(self, port, ip_address, database, username, password):
         threading.Thread.__init__(self)
         QObject.__init__(self)
 
         self.database = database
         self.username = username
+        self.password = password
         self.transport = None
         self.connection_init(port, ip_address)
         try:
@@ -32,12 +36,12 @@ class ClientTransport(threading.Thread, QObject):
             self.contacts_list_update()
         except OSError as err:
             if err.errno:
-                logger.critical(f'Потеряно соединение с сервером.')
-                raise Exception('Потеряно соединение с сервером!')
+                logger.critical(f'Потеряно соединение с сервером. - 1')
+                raise Exception('Потеряно соединение с сервером! - 1')
             logger.error('Timeout соединения при обновлении списков пользователей.')
         except json.JSONDecodeError:
-            logger.critical(f'Потеряно соединение с сервером.')
-            raise Exception('Потеряно соединение с сервером!')
+            logger.critical(f'Потеряно соединение с сервером. - 2')
+            raise Exception('Потеряно соединение с сервером! - 2')
         self.running = True
 
     def connection_init(self, port, ip):
@@ -67,8 +71,8 @@ class ClientTransport(threading.Thread, QObject):
                 send_message(self.transport, self.create_presence())
                 self.process_server_ans(get_message(self.transport))
         except (OSError, json.JSONDecodeError):
-            logger.critical('Потеряно соединение с сервером!')
-            raise Exception('Потеряно соединение с сервером!')
+            logger.critical('Потеряно соединение с сервером! - 2.5')
+            raise Exception('Неправильное имя пользователя или пароль!')
 
         logger.info('Соединение с сервером успешно установлено.')
 
@@ -77,7 +81,8 @@ class ClientTransport(threading.Thread, QObject):
             ACTION: PRESENCE,
             TIME: time.time(),
             USER: {
-                ACCOUNT_NAME: self.username
+                ACCOUNT_NAME: self.username,
+                ACCOUNT_PASSWORD: self.password
             }
         }
         logger.debug(f'Сформировано {PRESENCE} сообщение для пользователя {self.username}')
@@ -197,11 +202,11 @@ class ClientTransport(threading.Thread, QObject):
                     message = get_message(self.transport)
                 except OSError as err:
                     if err.errno:
-                        logger.critical(f'Потеряно соединение с сервером.')
+                        logger.critical(f'Потеряно соединение с сервером. - 4')
                         self.running = False
                         self.connection_lost.emit()
                 except (ConnectionError, ConnectionAbortedError, ConnectionResetError, json.JSONDecodeError, TypeError):
-                    logger.debug(f'Потеряно соединение с сервером.')
+                    logger.debug(f'Потеряно соединение с сервером. - 5')
                     self.running = False
                     self.connection_lost.emit()
                 else:
