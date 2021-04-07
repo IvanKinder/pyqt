@@ -1,0 +1,225 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+
+    <title>Server_database module &#8212; test_messenger 0.0.1 documentation</title>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="metaclasses module" href="metaclasses.html" />
+    <link rel="prev" title="Welcome to messenger’s documentation!" href="index.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="server-database-module">
+<h1>Server_database module<a class="headerlink" href="#server-database-module" title="Permalink to this headline">¶</a></h1>
+<p>Модуль базы данных сервера</p>
+<section id="server-database-py">
+<h2>server_database.py<a class="headerlink" href="#server-database-py" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="server_database.ServerStorage">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">server_database.</span></code><code class="sig-name descname"><span class="pre">ServerStorage</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#server_database.ServerStorage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Класс - серверная база данных:</p>
+<dl class="py class">
+<dt id="server_database.ServerStorage.ActiveUsers">
+<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">ActiveUsers</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ip_address</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">port</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">login_time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#server_database.ServerStorage.ActiveUsers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Класс - отображение таблицы активных пользователей</p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="server_database.ServerStorage.AllUsers">
+<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">AllUsers</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">username</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">password</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#server_database.ServerStorage.AllUsers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Класс - отображение таблицы всех пользователей</p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="server_database.ServerStorage.LoginHistory">
+<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">LoginHistory</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ip</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">port</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#server_database.ServerStorage.LoginHistory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Класс - отображение таблицы истории входов</p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="server_database.ServerStorage.UsersContacts">
+<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">UsersContacts</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contact</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#server_database.ServerStorage.UsersContacts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Класс - отображение таблицы контактов пользователей</p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="server_database.ServerStorage.UsersHistory">
+<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">UsersHistory</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#server_database.ServerStorage.UsersHistory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Класс отображение таблицы истории действий</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="server_database.ServerStorage.active_users_list">
+<code class="sig-name descname"><span class="pre">active_users_list</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#server_database.ServerStorage.active_users_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Функция возвращает список активных пользователей</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="server_database.ServerStorage.add_contact">
+<code class="sig-name descname"><span class="pre">add_contact</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contact</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#server_database.ServerStorage.add_contact" title="Permalink to this definition">¶</a></dt>
+<dd><p>Функция добавляет контакт для пользователя.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="server_database.ServerStorage.add_user">
+<code class="sig-name descname"><span class="pre">add_user</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">username</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">password</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#server_database.ServerStorage.add_user" title="Permalink to this definition">¶</a></dt>
+<dd><p>Добавление контакта</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="server_database.ServerStorage.check_password">
+<code class="sig-name descname"><span class="pre">check_password</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">username</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">password_to_check</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#server_database.ServerStorage.check_password" title="Permalink to this definition">¶</a></dt>
+<dd><p>Проверка пароля</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="server_database.ServerStorage.get_contacts">
+<code class="sig-name descname"><span class="pre">get_contacts</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">username</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#server_database.ServerStorage.get_contacts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Функция возвращает список контактов пользователя.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="server_database.ServerStorage.login_history">
+<code class="sig-name descname"><span class="pre">login_history</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">username</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#server_database.ServerStorage.login_history" title="Permalink to this definition">¶</a></dt>
+<dd><p>Функция возвращающаяя историю входов по пользователю или всем пользователям</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="server_database.ServerStorage.message_history">
+<code class="sig-name descname"><span class="pre">message_history</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#server_database.ServerStorage.message_history" title="Permalink to this definition">¶</a></dt>
+<dd><p>Функция возвращает количество переданных и полученных сообщений</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="server_database.ServerStorage.process_message">
+<code class="sig-name descname"><span class="pre">process_message</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sender</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recipient</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#server_database.ServerStorage.process_message" title="Permalink to this definition">¶</a></dt>
+<dd><p>Функция фиксирует передачу сообщения и делает соответствующие отметки в БД</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="server_database.ServerStorage.remove_contact">
+<code class="sig-name descname"><span class="pre">remove_contact</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contact</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#server_database.ServerStorage.remove_contact" title="Permalink to this definition">¶</a></dt>
+<dd><p>Функция удаляет контакт из базы данных</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="server_database.ServerStorage.user_login">
+<code class="sig-name descname"><span class="pre">user_login</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">username</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">password</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ip_address</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">port</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#server_database.ServerStorage.user_login" title="Permalink to this definition">¶</a></dt>
+<dd><p>Функция выполняющяяся при входе пользователя, записывает в базу факт входа</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="server_database.ServerStorage.user_logout">
+<code class="sig-name descname"><span class="pre">user_logout</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">username</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#server_database.ServerStorage.user_logout" title="Permalink to this definition">¶</a></dt>
+<dd><p>Функция фиксирующая отключение пользователя</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="server_database.ServerStorage.users_list">
+<code class="sig-name descname"><span class="pre">users_list</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#server_database.ServerStorage.users_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Функция возвращает список известных пользователей со временем последнего входа.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">test_messenger</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Server_database module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#server-database-py">server_database.py</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="metaclasses.html">metaclasses module</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="index.html" title="previous chapter">Welcome to messenger’s documentation!</a></li>
+      <li>Next: <a href="metaclasses.html" title="next chapter">metaclasses module</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2021, Ivan.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.5.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/server_database.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

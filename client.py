@@ -1,4 +1,7 @@
 import logging
+import os
+from Cryptodome.PublicKey import RSA
+
 import logs.config_client_log
 import argparse
 import sys
@@ -42,7 +45,8 @@ if __name__ == '__main__':
         start_dialog = UserNameDialog()
         client_app.exec_()
 
-        if start_dialog.ok_pressed and start_dialog.client_name.text() and start_dialog.client_pas.text():
+        if start_dialog.ok_pressed and start_dialog.client_name.text(
+        ) and start_dialog.client_pas.text():
             client_name = start_dialog.client_name.text()
             client_password = start_dialog.client_pas.text()
         else:
@@ -54,7 +58,12 @@ if __name__ == '__main__':
     database = ClientDatabase(client_name)
 
     try:
-        transport = ClientTransport(server_port, server_address, database, client_name, client_password)
+        transport = ClientTransport(
+            server_port,
+            server_address,
+            database,
+            client_name,
+            client_password)
         del start_dialog
     except Exception as err:
         print(str(err))

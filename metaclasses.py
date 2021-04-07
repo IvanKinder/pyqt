@@ -1,8 +1,9 @@
 import dis
 
 
-# Метакласс для проверки соответствия сервера:
 class ServerMaker(type):
+    """Метакласс для проверки соответствия сервера:"""
+
     def __init__(cls, clsname, bases, clsdict):
         # Список методов, которые используются в функциях класса:
         methods = []
@@ -33,8 +34,9 @@ class ServerMaker(type):
         super().__init__(clsname, bases, clsdict)
 
 
-# Метакласс для проверки корректности клиентов:
 class ClientMaker(type):
+    """Метакласс для проверки корректности клиентов:"""
+
     def __init__(cls, clsname, bases, clsdict):
         # Список методов, которые используются в функциях класса:
         methods = []

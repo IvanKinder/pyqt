@@ -1,3 +1,5 @@
+from common.variables import *
+from common.utils import *
 import socket
 import sys
 import time
@@ -5,13 +7,7 @@ import logging
 import json
 import threading
 from PyQt5.QtCore import pyqtSignal, QObject
-from PyQt5.QtWidgets import QMessageBox
-
-from client_ import start_dialog
-
 sys.path.append('../')
-from common.utils import *
-from common.variables import *
 
 
 logger = logging.getLogger('client_')
@@ -38,7 +34,8 @@ class ClientTransport(threading.Thread, QObject):
             if err.errno:
                 logger.critical(f'Потеряно соединение с сервером. - 1')
                 raise Exception('Потеряно соединение с сервером! - 1')
-            logger.error('Timeout соединения при обновлении списков пользователей.')
+            logger.error(
+                'Timeout соединения при обновлении списков пользователей.')
         except json.JSONDecodeError:
             logger.critical(f'Потеряно соединение с сервером. - 2')
             raise Exception('Потеряно соединение с сервером! - 2')
@@ -85,7 +82,8 @@ class ClientTransport(threading.Thread, QObject):
                 ACCOUNT_PASSWORD: self.password
             }
         }
-        logger.debug(f'Сформировано {PRESENCE} сообщение для пользователя {self.username}')
+        logger.debug(
+            f'Сформировано {PRESENCE} сообщение для пользователя {self.username}')
         return out
 
     def process_server_ans(self, message):
@@ -97,12 +95,15 @@ class ClientTransport(threading.Thread, QObject):
             elif message[RESPONSE] == 400:
                 raise Exception(f'{message[ERROR]}')
             else:
-                logger.debug(f'Принят неизвестный код подтверждения {message[RESPONSE]}')
+                logger.debug(
+                    f'Принят неизвестный код подтверждения {message[RESPONSE]}')
 
         elif ACTION in message and message[ACTION] == MESSAGE and SENDER in message and DESTINATION in message \
                 and MESSAGE_TEXT in message and message[DESTINATION] == self.username:
-            logger.debug(f'Получено сообщение от пользователя {message[SENDER]}:{message[MESSAGE_TEXT]}')
-            self.database.save_message(message[SENDER] , 'in' , message[MESSAGE_TEXT])
+            logger.debug(
+                f'Получено сообщение от пользователя {message[SENDER]}:{message[MESSAGE_TEXT]}')
+            self.database.save_message(
+                message[SENDER], 'in', message[MESSAGE_TEXT])
             self.new_message.emit(message[SENDER])
 
     def contacts_list_update(self):
